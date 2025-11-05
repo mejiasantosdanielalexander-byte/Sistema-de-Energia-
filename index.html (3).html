@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro Comercial Galería</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #121212;
+            --secondary: #1e1e1e;
+            --accent: #bb86fc;
+            --accent-secondary: #03dac6;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --error: #cf6679;
+            --card-bg: #1e1e1e;
+            --card-border: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--text-primary);
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid var(--card-border);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        
+        .last-update {
+            background-color: rgba(30, 30, 30, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .dashboard {
+            padding: 2.5rem 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 2.5rem;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            border: 1px solid var(--card-border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--accent), var(--accent-secondary));
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            gap: 5px;
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--error);
+        }
+        
+        .trend-stable {
+            color: var(--text-secondary);
+        }
+        
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .chart-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+        
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chart-title::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 20px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            background: rgba(30, 30, 30, 0.8);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            background: var(--accent);
+            color: var(--primary);
+            border-color: var(--accent);
+        }
+        
+        .btn.active {
+            background: var(--accent);
+            color: var(--primary);
+            border-color: var(--accent);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+        
+        .chart-container.large {
+            height: 400px;
+        }
+        
+        footer {
+            background-color: var(--secondary);
+            color: var(--text-primary);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid var(--card-border);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--success);
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px var(--success);
+        }
+        
+        .status-indicator.connecting {
+            background-color: var(--warning);
+            box-shadow: 0 0 10px var(--warning);
+        }
+        
+        .status-indicator.error {
+            background-color: var(--error);
+            box-shadow: 0 0 10px var(--error);
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .copyright {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .data-status {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .chart-card {
+                padding: 1.5rem;
+            }
+            
+            .chart-container {
+                height: 280px;
+            }
+            
+            .chart-container.large {
+                height: 320px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🏢</div>
+                    <h1>Centro Comercial Galería</h1>
+                </div>
+                <div class="last-update">
+                    Última actualización: <span id="last-update-time">Cargando...</span>
+                    <div class="data-status" id="data-status">Actualización cada 5 minutos</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Frecuencia</div>
+                    <div class="stat-value" id="frecuencia-value">-- Hz</div>
+                    <div class="stat-trend trend-stable">
+                        <span id="frecuencia-trend">--</span>
+                    </div>
+                    <div class="data-status" id="frecuencia-status">Actualizando cada 5m</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Potencia Total</div>
+                    <div class="stat-value" id="potencia-value">-- kW</div>
+                    <div class="stat-trend trend-stable">
+                        <span id="potencia-trend">--</span>
+                    </div>
+                    <div class="data-status" id="potencia-status">Actualizando cada 5m</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Corriente Promedio</div>
+                    <div class="stat-value" id="corriente-prom-value">-- A</div>
+                    <div class="stat-trend trend-stable">
+                        <span id="corriente-trend">--</span>
+                    </div>
+                    <div class="data-status" id="corriente-status">Calculado en tiempo real</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Voltaje Promedio</div>
+                    <div class="stat-value" id="voltaje-prom-value">-- V</div>
+                    <div class="stat-trend trend-stable">
+                        <span id="voltaje-trend">--</span>
+                    </div>
+                    <div class="data-status" id="voltaje-status">Calculado en tiempo real</div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card full-width">
+                    <div class="chart-header">
+                        <div class="chart-title">Potencia Total</div>
+                        <div class="chart-actions">
+                            <button class="btn active" id="toggle-potencia">Ver Datos</button>
+                        </div>
+                    </div>
+                    <div class="chart-container large">
+                        <canvas id="potencia-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Corrientes por Fase</div>
+                            <div class="chart-actions">
+                                <button class="btn active" id="toggle-corrientes">Todas</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="corrientes-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Voltajes por Fase</div>
+                            <div class="chart-actions">
+                                <button class="btn active" id="toggle-voltajes">Todas</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="voltajes-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="connection-status">
+                    <div class="status-indicator" id="connection-status"></div>
+                    <span id="connection-text">Conexión ThingSpeak: <strong>Conectando...</strong></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const THINGSPEAK_CONFIG = {
+            channelId: '3140358',
+            readApiKey: '3PDZSP5DAB25K7OO',
+            updateInterval: 300000,
+            results: 100
+        };
+
+        const THINGSPEAK_URLS = {
+            feeds: `https://api.thingspeak.com/channels/${THINGSPEAK_CONFIG.channelId}/feeds.json?api_key=${THINGSPEAK_CONFIG.readApiKey}&results=${THINGSPEAK_CONFIG.results}`
+        };
+
+        let currentData = {};
+        let previousData = {};
+        let charts = {};
+        let isConnected = false;
+        let historicalData = [];
+
+        function updateLastUpdateTime(timestamp) {
+            const timeElement = document.getElementById('last-update-time');
+            if (timestamp) {
+                const date = new Date(timestamp);
+                timeElement.textContent = date.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+            } else {
+                const now = new Date();
+                timeElement.textContent = now.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+            }
+        }
+
+        function updateConnectionStatus(status, message) {
+            const statusIndicator = document.getElementById('connection-status');
+            const connectionText = document.getElementById('connection-text');
+            
+            statusIndicator.className = 'status-indicator';
+            
+            switch(status) {
+                case 'connected':
+                    statusIndicator.classList.add('active');
+                    connectionText.innerHTML = 'Conexión ThingSpeak: <strong>Activa</strong>';
+                    isConnected = true;
+                    document.body.classList.remove('loading');
+                    break;
+                case 'connecting':
+                    statusIndicator.classList.add('connecting');
+                    connectionText.innerHTML = 'Conexión ThingSpeak: <strong>Conectando...</strong>';
+                    isConnected = false;
+                    document.body.classList.add('loading');
+                    break;
+                case 'error':
+                    statusIndicator.classList.add('error');
+                    connectionText.innerHTML = `Conexión ThingSpeak: <strong>Error - ${message}</strong>`;
+                    isConnected = false;
+                    document.body.classList.add('loading');
+                    break;
+            }
+        }
+
+        async function fetchDataFromThingSpeak() {
+            try {
+                updateConnectionStatus('connecting');
+                
+                const feedsResponse = await fetch(THINGSPEAK_URLS.feeds);
+                
+                if (!feedsResponse.ok) {
+                    throw new Error(`Error HTTP: ${feedsResponse.status}`);
+                }
+                
+                const feedsData = await feedsResponse.json();
+                
+                const processedData = processThingSpeakData(feedsData);
+                
+                if (Object.keys(currentData).length > 0) {
+                    previousData = {...currentData};
+                }
+                
+                currentData = processedData;
+                historicalData = feedsData.feeds || [];
+                
+                updateConnectionStatus('connected');
+                return processedData;
+                
+            } catch (error) {
+                console.error('Error al obtener datos de ThingSpeak:', error);
+                updateConnectionStatus('error', error.message);
+                return null;
+            }
+        }
+
+        function processThingSpeakData(feedsData) {
+            const fieldMap = {
+                'field1': 'frecuencia',
+                'field2': 'potenciaTotal', 
+                'field3': 'voltajeA',
+                'field4': 'voltajeB',
+                'field5': 'voltajeC',
+                'field6': 'corrienteA',
+                'field7': 'corrienteB',
+                'field8': 'corrienteC'
+            };
+            
+            const processedData = {};
+            
+            const sortedFeeds = [...feedsData.feeds].sort((a, b) => 
+                new Date(b.created_at) - new Date(a.created_at)
+            );
+            
+            Object.keys(fieldMap).forEach(field => {
+                const validFeed = sortedFeeds.find(feed => 
+                    feed[field] !== null && 
+                    feed[field] !== undefined && 
+                    feed[field] !== '' && 
+                    parseFloat(feed[field]) !== 0
+                );
+                
+                if (validFeed) {
+                    processedData[fieldMap[field]] = parseFloat(validFeed[field]);
+                } else {
+                    processedData[fieldMap[field]] = currentData[fieldMap[field]] || 0;
+                }
+            });
+            
+            if (processedData.voltajeA && processedData.voltajeB && processedData.voltajeC) {
+                processedData.voltajeAB = Math.sqrt(3) * processedData.voltajeA;
+                processedData.voltajeAC = Math.sqrt(3) * processedData.voltajeA;
+                processedData.voltajeBC = Math.sqrt(3) * processedData.voltajeB;
+                processedData.voltajeLL = processedData.voltajeAB;
+            }
+            
+            if (sortedFeeds.length > 0) {
+                processedData.timestamp = sortedFeeds[0].created_at;
+            } else {
+                processedData.timestamp = new Date().toISOString();
+            }
+            
+            return processedData;
+        }
+
+        function calculateTrend(current, previous, key) {
+            if (!previous || previous[key] === undefined || current === previous[key]) {
+                return { value: '--', trend: 'stable' };
+            }
+            
+            const difference = current - previous[key];
+            const trend = difference > 0 ? 'up' : 'down';
+            const value = `${Math.abs(difference).toFixed(1)}`;
+            
+            return { value, trend };
+        }
+
+        function updateStatsCards() {
+            if (!currentData || Object.keys(currentData).length === 0) return;
+            
+            const frecuenciaElement = document.getElementById('frecuencia-value');
+            const frecuenciaTrend = document.getElementById('frecuencia-trend');
+            if (currentData.frecuencia && currentData.frecuencia > 0) {
+                frecuenciaElement.textContent = `${currentData.frecuencia.toFixed(1)} Hz`;
+                
+                const frecuenciaTrendData = calculateTrend(currentData.frecuencia, previousData.frecuencia, 'frecuencia');
+                frecuenciaTrend.textContent = frecuenciaTrendData.value !== '--' ? 
+                    `${frecuenciaTrendData.trend === 'up' ? '+' : '-'}${frecuenciaTrendData.value} Hz` : '--';
+                frecuenciaTrend.parentElement.className = `stat-trend trend-${frecuenciaTrendData.trend}`;
+            }
+            
+            const potenciaElement = document.getElementById('potencia-value');
+            const potenciaTrend = document.getElementById('potencia-trend');
+            if (currentData.potenciaTotal && currentData.potenciaTotal > 0) {
+                potenciaElement.textContent = `${currentData.potenciaTotal.toFixed(1)} kW`;
+                
+                const potenciaTrendData = calculateTrend(currentData.potenciaTotal, previousData.potenciaTotal, 'potenciaTotal');
+                potenciaTrend.textContent = potenciaTrendData.value !== '--' ? 
+                    `${potenciaTrendData.trend === 'up' ? '+' : '-'}${potenciaTrendData.value} kW` : '--';
+                potenciaTrend.parentElement.className = `stat-trend trend-${potenciaTrendData.trend}`;
+            }
+            
+            if (currentData.corrienteA && currentData.corrienteB && currentData.corrienteC &&
+                currentData.corrienteA > 0 && currentData.corrienteB > 0 && currentData.corrienteC > 0) {
+                const avgCorriente = (currentData.corrienteA + currentData.corrienteB + currentData.corrienteC) / 3;
+                const previousAvgCorriente = previousData.corrienteA ? 
+                    (previousData.corrienteA + previousData.corrienteB + previousData.corrienteC) / 3 : null;
+                
+                const corrienteElement = document.getElementById('corriente-prom-value');
+                const corrienteTrend = document.getElementById('corriente-trend');
+                corrienteElement.textContent = `${avgCorriente.toFixed(1)} A`;
+                
+                const corrienteTrendData = calculateTrend(avgCorriente, previousAvgCorriente);
+                corrienteTrend.textContent = corrienteTrendData.value !== '--' ? 
+                    `${corrienteTrendData.trend === 'up' ? '+' : '-'}${corrienteTrendData.value} A` : '--';
+                corrienteTrend.parentElement.className = `stat-trend trend-${corrienteTrendData.trend}`;
+            }
+            
+            if (currentData.voltajeA && currentData.voltajeB && currentData.voltajeC &&
+                currentData.voltajeA > 0 && currentData.voltajeB > 0 && currentData.voltajeC > 0) {
+                const avgVoltaje = (currentData.voltajeA + currentData.voltajeB + currentData.voltajeC) / 3;
+                const previousAvgVoltaje = previousData.voltajeA ? 
+                    (previousData.voltajeA + previousData.voltajeB + previousData.voltajeC) / 3 : null;
+                
+                const voltajeElement = document.getElementById('voltaje-prom-value');
+                const voltajeTrend = document.getElementById('voltaje-trend');
+                voltajeElement.textContent = `${avgVoltaje.toFixed(1)} V`;
+                
+                const voltajeTrendData = calculateTrend(avgVoltaje, previousAvgVoltaje);
+                voltajeTrend.textContent = voltajeTrendData.value !== '--' ? 
+                    `${voltajeTrendData.trend === 'up' ? '+' : '-'}${voltajeTrendData.value} V` : '--';
+                voltajeTrend.parentElement.className = `stat-trend trend-${voltajeTrendData.trend}`;
+            }
+            
+            if (currentData.timestamp) {
+                updateLastUpdateTime(currentData.timestamp);
+            }
+            
+            const dataStatus = document.getElementById('data-status');
+            dataStatus.textContent = `Actualización cada 5 minutos`;
+        }
+
+        const darkChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e0e0e0',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(30, 30, 30, 0.9)',
+                    titleColor: '#bb86fc',
+                    bodyColor: '#e0e0e0',
+                    borderColor: '#333333',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#a0a0a0',
+                        maxTicksLimit: 10
+                    },
+                    reverse: true
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#a0a0a0'
+                    }
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.4
+                }
+            }
+        };
+
+        function initializeCharts() {
+            const ctx1 = document.getElementById('potencia-chart').getContext('2d');
+            charts.potencia = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Potencia Total (kW)',
+                            data: [],
+                            borderColor: '#03dac6',
+                            backgroundColor: 'rgba(3, 218, 198, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#03dac6',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            spanGaps: true
+                        }
+                    ]
+                },
+                options: {
+                    ...darkChartOptions,
+                    scales: {
+                        ...darkChartOptions.scales,
+                        y: {
+                            ...darkChartOptions.scales.y,
+                            title: {
+                                display: true,
+                                text: 'Potencia (kW)',
+                                color: '#a0a0a0'
+                            },
+                            min: 100,
+                            max: 1800
+                        }
+                    },
+                    plugins: {
+                        ...darkChartOptions.plugins,
+                        title: {
+                            display: true,
+                            text: 'Evolución de la Potencia Total',
+                            color: '#e0e0e0',
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('corrientes-chart').getContext('2d');
+            charts.corrientes = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Corriente A (A)',
+                            data: [],
+                            borderColor: '#bb86fc',
+                            backgroundColor: 'rgba(187, 134, 252, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Corriente B (A)',
+                            data: [],
+                            borderColor: '#03dac6',
+                            backgroundColor: 'rgba(3, 218, 198, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Corriente C (A)',
+                            data: [],
+                            borderColor: '#cf6679',
+                            backgroundColor: 'rgba(207, 102, 121, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true
+                        }
+                    ]
+                },
+                options: {
+                    ...darkChartOptions,
+                    scales: {
+                        ...darkChartOptions.scales,
+                        y: {
+                            ...darkChartOptions.scales.y,
+                            title: {
+                                display: true,
+                                text: 'Corriente (A)',
+                                color: '#a0a0a0'
+                            },
+                            min: 0,
+                            max: 60
+                        }
+                    }
+                }
+            });
+
+            const ctx3 = document.getElementById('voltajes-chart').getContext('2d');
+            charts.voltajes = new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Voltaje A (V)',
+                            data: [],
+                            borderColor: '#bb86fc',
+                            backgroundColor: 'rgba(187, 134, 252, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Voltaje B (V)',
+                            data: [],
+                            borderColor: '#03dac6',
+                            backgroundColor: 'rgba(3, 218, 198, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true
+                        },
+                        {
+                            label: 'Voltaje C (V)',
+                            data: [],
+                            borderColor: '#cf6679',
+                            backgroundColor: 'rgba(207, 102, 121, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            spanGaps: true
+                        }
+                    ]
+                },
+                options: {
+                    ...darkChartOptions,
+                    scales: {
+                        ...darkChartOptions.scales,
+                        y: {
+                            ...darkChartOptions.scales.y,
+                            title: {
+                                display: true,
+                                text: 'Voltaje (V)',
+                                color: '#a0a0a0'
+                            },
+                            min: 13000,
+                            max: 15000
+                        }
+                    }
+                }
+            });
+        }
+
+        function processDataForCharts(dataArray) {
+            let lastValidValue = null;
+            return dataArray.map(value => {
+                if (value !== null && value !== undefined && !isNaN(value)) {
+                    lastValidValue = value;
+                    return value;
+                }
+                return lastValidValue;
+            });
+        }
+
+        function updateCharts() {
+            if (!historicalData || historicalData.length === 0) return;
+            
+            const validFeeds = historicalData.filter(feed => 
+                feed.field1 !== null || feed.field2 !== null || 
+                feed.field3 !== null || feed.field4 !== null || 
+                feed.field5 !== null || feed.field6 !== null || 
+                feed.field7 !== null || feed.field8 !== null
+            );
+            
+            if (validFeeds.length === 0) return;
+            
+            const labels = validFeeds.map(item => {
+                const date = new Date(item.created_at);
+                return date.toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+            });
+            
+            const potenciaData = validFeeds.map(item => 
+                parseFloat(item.field2) || null
+            );
+            
+            const corrienteAData = validFeeds.map(item => 
+                parseFloat(item.field6) || null
+            );
+            const corrienteBData = validFeeds.map(item => 
+                parseFloat(item.field7) || null
+            );
+            const corrienteCData = validFeeds.map(item => 
+                parseFloat(item.field8) || null
+            );
+            
+            const voltajeAData = validFeeds.map(item => 
+                parseFloat(item.field3) || null
+            );
+            const voltajeBData = validFeeds.map(item => 
+                parseFloat(item.field4) || null
+            );
+            const voltajeCData = validFeeds.map(item => 
+                parseFloat(item.field5) || null
+            );
+            
+            const processedPotenciaData = processDataForCharts(potenciaData);
+            const processedCorrienteAData = processDataForCharts(corrienteAData);
+            const processedCorrienteBData = processDataForCharts(corrienteBData);
+            const processedCorrienteCData = processDataForCharts(corrienteCData);
+            const processedVoltajeAData = processDataForCharts(voltajeAData);
+            const processedVoltajeBData = processDataForCharts(voltajeBData);
+            const processedVoltajeCData = processDataForCharts(voltajeCData);
+            
+            if (charts.potencia) {
+                charts.potencia.data.labels = labels;
+                charts.potencia.data.datasets[0].data = processedPotenciaData;
+                charts.potencia.update('none');
+            }
+            
+            if (charts.corrientes) {
+                charts.corrientes.data.labels = labels;
+                charts.corrientes.data.datasets[0].data = processedCorrienteAData;
+                charts.corrientes.data.datasets[1].data = processedCorrienteBData;
+                charts.corrientes.data.datasets[2].data = processedCorrienteCData;
+                charts.corrientes.update('none');
+            }
+            
+            if (charts.voltajes) {
+                charts.voltajes.data.labels = labels;
+                charts.voltajes.data.datasets[0].data = processedVoltajeAData;
+                charts.voltajes.data.datasets[1].data = processedVoltajeBData;
+                charts.voltajes.data.datasets[2].data = processedVoltajeCData;
+                charts.voltajes.update('none');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLastUpdateTime();
+            initializeCharts();
+            updateConnectionStatus('connecting');
+            
+            fetchDataFromThingSpeak().then(data => {
+                if (data) {
+                    updateStatsCards();
+                    updateCharts();
+                }
+            });
+            
+            setInterval(async () => {
+                const data = await fetchDataFromThingSpeak();
+                if (data) {
+                    updateStatsCards();
+                    updateCharts();
+                }
+            }, THINGSPEAK_CONFIG.updateInterval);
+
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
